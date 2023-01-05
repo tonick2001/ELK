@@ -1,0 +1,19 @@
+ansible_user: tonick
+network_name: elk-net
+network_subnet: 172.24.2.0/24
+
+#elasticsearch_image: docker.elastic.co/elasticsearch/elasticsearch:8.5.3
+elasticsearch_image: elasticsearch:8.5.3
+elasticsearch_hostname: es01
+elasticsearch_memory: 2096m
+#elasticsearch_conf_dir: /usr/share/elasticsearch
+
+#logstash_image: docker.elastic.co/logstash/logstash:8.5.3
+logstash_image: logstash:8.5.3
+logstash_hostname: lo01
+logstash_memory: 1024m
+logstash_conf_dir: /usr/share/logstash
+
+kibana_image: kibana:8.5.3
+kibana_hostname: kibana01
+kibana_memory: 1024m
