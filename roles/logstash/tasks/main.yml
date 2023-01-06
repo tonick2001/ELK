@@ -23,7 +23,7 @@
       - 5000:5000
       - 5044:5044
     volumes:
-      - "{{ logstash_conf_dir }}/pipline:/usr/share/logstash/pipline:ro"
+      - "{{ logstash_conf_dir }}/pipeline:/usr/share/logstash/pipeline:ro"
     networks:
       - name: "{{ network_name }}"
     log_driver: "{{ log_driver }}"
