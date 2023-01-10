@@ -1,7 +1,7 @@
 - hosts: "{{ srv }}"
   become: true
   roles:
-    #- { role: docker, tags: ["docker"]} 
-    #- { role: elasticsearch, tags: ["elasticsearch"]}
+    - { role: docker, tags: ["docker"]} 
+    - { role: elasticsearch, tags: ["elasticsearch"]}
     - { role: logstash, tags: ["logstash"]}
-    #- { role: kibana, tags: ["kibana"]}
+    - { role: kibana, tags: ["kibana"]}

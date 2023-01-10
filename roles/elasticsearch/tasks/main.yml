@@ -21,6 +21,8 @@
       xpack.monitoring.collection.enabled: "true"
     volumes:
       - "esdata:/usr/share/elasticsearch/data:rw"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
       - "9200:9200/tcp"
     networks:

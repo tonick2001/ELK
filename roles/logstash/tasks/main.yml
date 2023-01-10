@@ -1,9 +1,9 @@
 - name: Create logstash pipline conf dir
   ansible.builtin.file:
-    path: "{{ logstash_conf_dir }}/pipeline"
-    mode: 0770
-    owner: root
+    path: "/{{ logstash_conf_dir }}/pipeline"
+    owner: '1000'
     group: root
+    mode: '0774'
     state: directory
 
 - name: Copy logstash pipline conf
@@ -14,9 +14,10 @@
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   with_items:
-    - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: 0770, owner: root, group: root}
-    - { src: 'templates/beats.conf', dest: '/{{ logstash_conf_dir }}/pipeline/beats.conf', mode: 0770, owner: root, group: root}
-    - { src: 'templates/pipelines.yml', dest: '/{{ logstash_conf_dir }}/pipelines.yml', mode: 0770, owner: root, group: root}
+    # - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: 0770, owner: root, group: docker}
+    - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: '0774', owner: '1000', group: root }
+    - { src: 'templates/beats.conf', dest: '/{{ logstash_conf_dir }}/pipeline/beats.conf', mode: '0774', owner: '1000', group: root }
+    - { src: 'templates/pipelines.yml', dest: '/{{ logstash_conf_dir }}/pipelines.yml', mode: '0774', owner: '1000', group: root }
   notify: Restart logstash container
 
 - name: Start logstash container
@@ -36,6 +37,8 @@
     volumes:
       - "{{ logstash_conf_dir }}/pipeline:/usr/share/logstash/pipeline:ro"
       - "{{ logstash_conf_dir }}/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - name: "{{ network_name }}"
     log_driver: "{{ log_driver }}"
