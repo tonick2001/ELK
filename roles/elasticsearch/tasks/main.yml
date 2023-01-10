@@ -1,22 +1,22 @@
 - name: Create elasticsearch volume
-  docker_volume:
+  community.docker.docker_volume:
     name: esdata
     driver: local
-- name: add vm.max_map_count=262144
+- name: Add vm.max_map_count=262144
   ansible.posix.sysctl:
     name: vm.max_map_count
     value: '262144'
     sysctl_file: /etc/sysctl.conf
-    reload: yes
+    reload: true
 - name: Run elastic container
   community.docker.docker_container:
     name: "{{ elasticsearch_hostname }}"
     image: "{{ elasticsearch_image }}"
-    memory: "{{elasticsearch_memory}}"
+    memory: "{{ elasticsearch_memory }}"
     env:
       discovery.type: "single-node"
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-      #ELASTIC_PASSWORD: "{{ elastic_password }}"
+      # ELASTIC_PASSWORD: "{{ elastic_password }}"
       xpack.security.enabled: "true"
       xpack.monitoring.collection.enabled: "true"
     volumes:
@@ -27,14 +27,15 @@
       - name: "{{ network_name }}"
     restart_policy: "unless-stopped"
     ulimits:
-    - nofile:65535:65535
+      - nofile:65535:65535
     state: started
     log_driver: "{{ log_driver }}"
     log_options:
       max-size: "{{ log_max_size }}"
       max-file: "{{ log_max_file }}"
 
-- debug:
+- name: Manual setting set
+  ansible.builtin.debug:
     msg: >
       Users have to be configured manually. Enable and set the password for the default users with:
       'docker exec -it {{ elasticsearch_hostname }} /bin/bash -c "elasticsearch-setup-passwords auto"'

@@ -1,13 +1,24 @@
 - name: Create logstash pipline conf dir
-  file:
+  ansible.builtin.file:
     path: "{{ logstash_conf_dir }}/pipeline"
+    mode: 0770
+    owner: root
+    group: root
     state: directory
+
 - name: Copy logstash pipline conf
-  template: src={{ item.src }} dest={{ item.dest }}
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
   with_items:
-    - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf' }
-    - { src: 'templates/beats.conf', dest: '/{{ logstash_conf_dir }}/pipeline/beats.conf' }
+    - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: 0770, owner: root, group: root}
+    - { src: 'templates/beats.conf', dest: '/{{ logstash_conf_dir }}/pipeline/beats.conf', mode: 0770, owner: root, group: root}
+    - { src: 'templates/pipelines.yml', dest: '/{{ logstash_conf_dir }}/pipelines.yml', mode: 0770, owner: root, group: root}
   notify: Restart logstash container
+
 - name: Start logstash container
   community.docker.docker_container:
     name: "{{ logstash_hostname }}"
@@ -15,7 +26,7 @@
     memory: "{{ logstash_memory }}"
     env:
       XPACK_MONITORING_ELASTICSEARCH_HOSTS: "http://{{ elasticsearch_hostname }}:9200"
-      XPACK_MONITORING_ENABLED: "true"
+      XPACK_MONITORING_ENABLED: "false"
       XPACK_MONITORING_USERNAME: "elastic"
       XPACK_MONITORING_PASSWORD: "{{ elastic_password }}"
       PATH_CONFIG: ""
@@ -24,9 +35,11 @@
       - 5044:5044
     volumes:
       - "{{ logstash_conf_dir }}/pipeline:/usr/share/logstash/pipeline:ro"
+      - "{{ logstash_conf_dir }}/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro"
     networks:
       - name: "{{ network_name }}"
     log_driver: "{{ log_driver }}"
     log_options:
       max-size: "{{ log_max_size }}"
       max-file: "{{ log_max_file }}"
+    restart_policy: "unless-stopped"
