@@ -14,7 +14,6 @@
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   with_items:
-    # - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: 0770, owner: root, group: docker}
     - { src: 'templates/syslog.conf', dest: '/{{ logstash_conf_dir }}/pipeline/syslog.conf', mode: '0774', owner: '1000', group: root }
     - { src: 'templates/beats.conf', dest: '/{{ logstash_conf_dir }}/pipeline/beats.conf', mode: '0774', owner: '1000', group: root }
     - { src: 'templates/pipelines.yml', dest: '/{{ logstash_conf_dir }}/pipelines.yml', mode: '0774', owner: '1000', group: root }
@@ -27,12 +26,13 @@
     memory: "{{ logstash_memory }}"
     env:
       XPACK_MONITORING_ELASTICSEARCH_HOSTS: "http://{{ elasticsearch_hostname }}:9200"
-      XPACK_MONITORING_ENABLED: "false"
-      XPACK_MONITORING_USERNAME: "elastic"
-      XPACK_MONITORING_PASSWORD: "{{ elastic_password }}"
+      XPACK_MONITORING_ENABLED: "true"
+      #XPACK_MONITORING_USERNAME: "elastic"
+      #XPACK_MONITORING_PASSWORD: "{{ elastic_password }}"
       PATH_CONFIG: ""
     ports:
-      - 5000:5000
+      - 5000:5000/udp
+      #- 5000:5000/tcp
       - 5044:5044
     volumes:
       - "{{ logstash_conf_dir }}/pipeline:/usr/share/logstash/pipeline:ro"
